@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { MobileMenu } from './MobileMenu';
 import LogoutButton from './LogoutButton';
+import BrandIcon from '@/assets/brand.png';
 
 type MenuProps = {
   isAdmin: boolean;
@@ -35,7 +36,9 @@ export default function Menu({ isAdmin }: MenuProps) {
   return (
     <>
       <AsideMenu>
-        <Brand />
+        <Brand>
+          <img src={BrandIcon.src} alt="Brand Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        </Brand>
         <MenuItensList>
           {options.map(({ icon, name, path }) => (
             <MenuItensOption
@@ -114,7 +117,6 @@ const MenuItensOptionText = styled.a`
 
 const Brand = styled.div`
   margin: 1rem;
-  border: 1px solid black;
   width: auto;
   height: 6rem;
 `

@@ -1,12 +1,61 @@
 "use client"
 
-import { useState } from 'react';
 import styled from 'styled-components';
+import { useCallback, useState } from 'react';
 import FileUploader from '../common/FileUploader';
+import { HttpService } from '@/service/http';
 
-export default function TaxCalculationSelector() {
+interface TaxCalculationSelectorProps {
+  token: string;
+}
+
+export default function TaxCalculationSelector({ token }: TaxCalculationSelectorProps) {
   const [option, setOption] = useState('');
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState<string>('');
+
+  const handleFile = (file: File | null) => {
+    setFiles([file!])
+  };
+
+  const handleGenerate = useCallback(async () => {
+    if (!option) {
+      setError('Por favor, selecione um relatório.');
+      return;
+    }
+    if (files.length === 0) {
+      setError('Por favor, selecione um arquivo.');
+      return;
+    }
+
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      switch (option) {
+        case 'exclusao-pis-cofins':
+          const formData = new FormData();
+          formData.append('file', files[0]);
+          
+          const service = new HttpService(token);
+          await service.postExclusaoPisCofinsJob(formData);
+          
+          setSuccess('Relatório enviado com sucesso! Verifique a tabela abaixo para acompanhar o progresso.');
+          setFiles([]);
+          setOption('');
+          break;
+        default:
+          setError('Opção de relatório inválida.');
+      }
+    } catch (e: any) {
+      setError(`Erro ao enviar relatório: ${e?.message || String(e)}`);
+    } finally {
+      setLoading(false);
+    }
+  }, [option, files, token]);
 
   return (
     <Container>
@@ -18,17 +67,15 @@ export default function TaxCalculationSelector() {
           <Option value="exclusao-pis-cofins" >Exclusão Pis/Cofins</Option>
         </Selector>
 
-        <FileUploader
-          onFilesSelected={setSelectedFiles}
-          multiple={false}
-          maxFiles={1}
-          maxSizeMB={200}
-        />
+        <FileUploader onFileSelect={handleFile} />
 
-        <Button onClick={() => console.log(option)}>
-          <ButtonText>Gerar</ButtonText>
+        <Button onClick={handleGenerate} disabled={loading}>
+          <ButtonText>{loading ? 'Enviando...' : 'Gerar'}</ButtonText>
         </Button>
       </SelectorContainer>
+
+      {error && <ErrorText>{error}</ErrorText>}
+      {success && <SuccessText>{success}</SuccessText>}
     </Container>
   )
 }
@@ -51,6 +98,8 @@ const Label = styled.p`
 const SelectorContainer = styled.div`
   display: flex;
   flex-direction: row;
+  gap: 1.5rem;
+  align-items: center;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -75,7 +124,7 @@ const Selector = styled.select`
 const Option = styled.option``
 
 const Button = styled.button`
-  margin-left: 1rem;
+  /* margin-left: 1rem; */
   background-color: #eeeeed;
   display: flex;
   align-items: center;
@@ -100,3 +149,15 @@ const Button = styled.button`
 `
 
 const ButtonText = styled.span``
+
+const ErrorText = styled.p`
+  color: red;
+  margin-top: 1rem;
+  margin-bottom: 0;
+`
+
+const SuccessText = styled.p`
+  color: green;
+  margin-top: 1rem;
+  margin-bottom: 0;
+`

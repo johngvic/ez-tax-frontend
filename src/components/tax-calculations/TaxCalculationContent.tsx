@@ -2,17 +2,24 @@
 
 import styled from "styled-components";
 import TaxCalculationSelector from "@/components/tax-calculations/TaxCalculationSelector";
+import TaxCalculationTable from "@/components/tax-calculations/TaxCalculationTable";
 
-export default function TaxCalculationContent() {
+interface TaxCalculationContentProps {
+  token: string;
+}
+
+export default function TaxCalculationContent({ token }: TaxCalculationContentProps) {
   return (
     <Container>
-      <TaxCalculationSelector/>
+      <TaxCalculationSelector token={token} />
+      <TaxCalculationTable token={token} />
     </Container>
   )
 }
 
 const Container = styled.div`
   display: flex;
+  flex-direction: column;
   position: absolute;
   margin: 8rem 0 0 19rem;
 

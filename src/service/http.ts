@@ -1,3 +1,5 @@
+import { ExclusaoPisCofinsJob } from "@/types/TaxCalculations";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export class HttpService {
@@ -20,19 +22,58 @@ export class HttpService {
     return response.json();
   }
 
-  async exclusaoPisCofins(data: FormData) {
+  async getExclusaoPisCofinsJobs(): Promise<ExclusaoPisCofinsJob[]> {
     const response = await fetch(`${BASE_URL}/tax-calculations/exclusao-pis-cofins`, {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${this.token}`,
-        'Content-Type': 'multipart/form-data`,',
+        'Content-Type': 'application/json',
       },
-      body: data,
     });
 
     if (!response.ok) {
       throw new Error(`Status request failed: ${response.statusText}`);
     }
+
     return response.json();
+  }
+
+  async postExclusaoPisCofinsJob(data: FormData) {
+    const response = await fetch(`${BASE_URL}/tax-calculations/exclusao-pis-cofins`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.token}`
+      },
+      body: data
+    });
+
+    if (!response.ok) {
+      throw new Error(`Status request failed: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  async downloadExclusaoPisCofinsJob(calculationId: string) {
+    const response = await fetch(`${BASE_URL}/tax-calculations/exclusao-pis-cofins/${calculationId}/download`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${this.token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Download request failed: ${response.statusText}`);
+    }
+
+    const { url } = await response.json();
+    
+    const fileResponse = await fetch(url);
+    if (!fileResponse.ok) {
+      throw new Error(`File download failed: ${fileResponse.statusText}`);
+    }
+
+    return fileResponse.blob();
   }
 }
