@@ -1,9 +1,10 @@
 "use client"
 
 import styled from 'styled-components';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import FileUploader from '../common/FileUploader';
 import { HttpService } from '@/service/http';
+import toast from 'react-hot-toast';
 
 interface TaxCalculationSelectorProps {
   token: string;
@@ -12,26 +13,40 @@ interface TaxCalculationSelectorProps {
 export default function TaxCalculationSelector({ token }: TaxCalculationSelectorProps) {
   const [option, setOption] = useState('');
   const [files, setFiles] = useState<File[]>([]);
-  const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState<string>('');
 
-  const handleFile = (file: File | null) => {
-    setFiles([file!])
+  useEffect(() => {
+    const storedToast = sessionStorage.getItem('pendingToast');
+    if (storedToast) {
+      try {
+        const { type, message } = JSON.parse(storedToast);
+        if (type === 'success') {
+          toast.success(message);
+        } else if (type === 'error') {
+          toast.error(message);
+        }
+        sessionStorage.removeItem('pendingToast');
+      } catch (error) {
+        console.error('Error parsing stored toast:', error);
+        sessionStorage.removeItem('pendingToast');
+      }
+    }
+  }, []);
+
+  const handleFile = (files: File[]) => {
+    setFiles(files);
   };
 
   const handleGenerate = useCallback(async () => {
     if (!option) {
-      setError('Por favor, selecione um relatório.');
+      toast.error('Por favor, selecione um tipo de cálculo.');
       return;
     }
     if (files.length === 0) {
-      setError('Por favor, selecione um arquivo.');
+      toast.error('Por favor, selecione um arquivo.');
       return;
     }
 
-    setError('');
-    setSuccess('');
     setLoading(true);
 
     try {
@@ -43,15 +58,22 @@ export default function TaxCalculationSelector({ token }: TaxCalculationSelector
           const service = new HttpService(token);
           await service.postExclusaoPisCofinsJob(formData);
           
-          setSuccess('Relatório enviado com sucesso! Verifique a tabela abaixo para acompanhar o progresso.');
+          sessionStorage.setItem('pendingToast', JSON.stringify({
+            type: 'success',
+            message: 'Relatório enviado com sucesso! Verifique a tabela abaixo para acompanhar o progresso.'
+          }));
+          
+          window.location.reload();
+
           setFiles([]);
           setOption('');
           break;
         default:
-          setError('Opção de relatório inválida.');
+          toast.error('Opção de relatório inválida.');
       }
-    } catch (e: any) {
-      setError(`Erro ao enviar relatório: ${e?.message || String(e)}`);
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      toast.error(`Erro ao enviar relatório: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -59,7 +81,7 @@ export default function TaxCalculationSelector({ token }: TaxCalculationSelector
 
   return (
     <Container>
-      <Label>Selecione o relatório</Label>
+      <Label>Selecione o tipo de cálculo</Label>
 
       <SelectorContainer>
         <Selector name='selectReport' value={option} onChange={(e) => setOption(e.target.value)}>
@@ -73,9 +95,6 @@ export default function TaxCalculationSelector({ token }: TaxCalculationSelector
           <ButtonText>{loading ? 'Enviando...' : 'Gerar'}</ButtonText>
         </Button>
       </SelectorContainer>
-
-      {error && <ErrorText>{error}</ErrorText>}
-      {success && <SuccessText>{success}</SuccessText>}
     </Container>
   )
 }
@@ -97,9 +116,8 @@ const Label = styled.p`
 
 const SelectorContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 1.5rem;
-  align-items: center;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -124,10 +142,7 @@ const Selector = styled.select`
 const Option = styled.option``
 
 const Button = styled.button`
-  /* margin-left: 1rem; */
   background-color: #eeeeed;
-  display: flex;
-  align-items: center;
   gap: 0.35em;
   padding: .5rem 1.25rem;
   padding-right: 1.25em;
@@ -137,6 +152,7 @@ const Button = styled.button`
   font-size: 1rem;
   transition: .4s;
   cursor: pointer;
+  width: 15rem;
 
   &:hover {
     box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
@@ -149,15 +165,3 @@ const Button = styled.button`
 `
 
 const ButtonText = styled.span``
-
-const ErrorText = styled.p`
-  color: red;
-  margin-top: 1rem;
-  margin-bottom: 0;
-`
-
-const SuccessText = styled.p`
-  color: green;
-  margin-top: 1rem;
-  margin-bottom: 0;
-`

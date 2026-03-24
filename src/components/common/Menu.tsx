@@ -9,7 +9,7 @@ import LogoutButton from './LogoutButton';
 import BrandIcon from '@/assets/brand.png';
 
 type MenuProps = {
-  isAdmin: boolean;
+  isAdmin?: boolean;
 }
 
 export default function Menu({ isAdmin }: MenuProps) {
@@ -18,15 +18,10 @@ export default function Menu({ isAdmin }: MenuProps) {
   const router = useRouter();
   const options = [
     {
-      name: 'Dashboard',
-      icon: <LayoutDashboard width={20} />,
-      path: '/dashboard'
-    },
-    ...(isAdmin ? [{
       name: 'Cálculos Fiscais',
       icon: <CalculatorIcon width={20} />,
       path: '/tax-calculations'
-    }] : [])
+    }
   ]
 
   const redirect = (path: string) => {

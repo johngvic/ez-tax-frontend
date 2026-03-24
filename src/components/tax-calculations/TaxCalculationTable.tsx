@@ -79,12 +79,12 @@ export default function TaxCalculationTable({ token }: TaxCalculationTableProps)
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div style={{ marginLeft: '4rem' }}>Loading...</div>;
+  if (error) return <div style={{ marginLeft: '4rem' }}>Error: {error}</div>;
 
   return (
     <Container>
-      <Title>Cálculos solicitados</Title>
+      <Title>Histórico de Cálculos</Title>
       <Table>
         <thead>
           <tr>
