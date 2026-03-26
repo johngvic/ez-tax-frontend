@@ -40,7 +40,7 @@ const SubmitContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 57px;
+  margin-top: 40px;
 `
 
 const SubmitButton = styled(SignUp.Action)`

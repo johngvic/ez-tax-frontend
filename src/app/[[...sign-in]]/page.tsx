@@ -13,14 +13,13 @@ import {
   FieldsContainer,
   GreetingTextBottomLink
 } from '@/components/auth/common';
-import { ClerkProvider } from '@clerk/nextjs';
 
 export default function SignInPage() {
   return (
     <Container>
       <AuthContainer>
         <SignIn.Root>
-          <SignIn.Step style={{ alignItems: "center" }} name="start">
+          <SignIn.Step style={{ alignItems: "center", textAlign: "center" }} name="start">
 
             <GreetingContainer>
               <GreetingTextTop>Acesse sua conta</GreetingTextTop>
@@ -34,6 +33,8 @@ export default function SignInPage() {
               <FieldInput name='identifier' type='text' placeholder='Email' required />
               <FieldInput name='password' type='password' placeholder='Senha' required />
             </FieldsContainer>
+
+            <ForgotPasswordLink onClick={() => redirect('/forgot-password')}>Esqueci minha senha</ForgotPasswordLink>
 
             <Clerk.GlobalError />
 
@@ -78,4 +79,15 @@ const GreetingTextBottom = styled.p`
   letter-spacing: 0%;
   text-align: center;
   vertical-align: middle;
+`
+
+export const ForgotPasswordLink = styled.a`
+  font-family: "Work Sans";
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: underline;
+  text-decoration-style: solid;
+  text-decoration-thickness: 0%;
+  color: rgba(0, 209, 196, 1);
+  cursor: pointer;
 `

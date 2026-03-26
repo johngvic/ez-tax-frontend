@@ -56,6 +56,7 @@ export const FieldsContainer = styled.div`
   flex-direction: column;
   align-items: center;
   margin-top: 58px;
+  margin-bottom: 1rem;
   gap: 25px;
 
   @media (max-width: 767px) {
