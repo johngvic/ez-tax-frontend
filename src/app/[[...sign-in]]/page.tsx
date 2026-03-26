@@ -48,7 +48,7 @@ export default function SignInPage() {
 
 const AuthContainer = styled.div`
   width: 564px;
-  height: 400px;
+  height: auto;
   border-radius: 53px;
   border-width: 1px;
   padding-top: 58px;
