@@ -15,7 +15,6 @@ const Button = styled(SignOutButton)`
   background-color: #fca5a5;
   margin-top: auto;
   margin-bottom: 2rem;
-  margin-left: 2rem;
   width: 1rem;
   color: #7f1d1d;
   border: none;
@@ -23,7 +22,7 @@ const Button = styled(SignOutButton)`
   font-size: 16px;
   font-weight: 500;
   transition: all 0.2s ease;
-  align-self: flex-start;
+  align-self: center;
   cursor: pointer;
   
   &:hover {

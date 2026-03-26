@@ -80,7 +80,7 @@ export default function TaxCalculationTable({ token }: TaxCalculationTableProps)
   };
 
   if (loading) return <div style={{ marginLeft: '4rem' }}>Loading...</div>;
-  if (error) return <div style={{ marginLeft: '4rem' }}>Error: {error}</div>;
+  if (error) return <GenericErrorContainer>Erro: {error}</GenericErrorContainer>;
 
   return (
     <Container>
@@ -163,4 +163,14 @@ const DownloadButton = styled.button`
   &:hover {
     background-color: #45a049;
   }
+`;
+
+const GenericErrorContainer = styled.div`
+  margin-left: 4rem;
+  margin-top: 5rem;
+  padding: 1rem;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: .6rem;
 `;
