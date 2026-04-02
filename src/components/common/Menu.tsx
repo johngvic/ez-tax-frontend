@@ -19,7 +19,7 @@ export default function Menu({ isAdmin }: MenuProps) {
   const options = [
     {
       name: 'Cálculos Fiscais',
-      icon: <CalculatorIcon width={20} />,
+      icon: <CalculatorIcon width={20} style={{ color: '#FFFFFF' }} />,
       path: '/tax-calculations'
     }
   ]
@@ -61,7 +61,7 @@ const AsideMenu = styled.nav`
   flex-direction: column;
   height: 100vh;
   width: 300px;
-  background: #F7F7F7;
+  background: #002B4D;
   transition: transform 0.3s ease;
   box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
 
@@ -82,28 +82,25 @@ const MenuItensOption = styled.li<{ active?: boolean }>`
   margin: 12px 0;
   align-items: center;
   border-radius: .8rem;
-  transition: all 0.2s ease;
+  transition: all 0.4s ease;
   padding: .5rem .8rem;
-  border: 1px solid #E5E4E2;
 
   &:hover {
     cursor: pointer;
-    background: #FFFFFF;
+    background: #234664;
     transform: translateY(-1px);
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   }
 
   ${({ active }) =>
     active &&
     `
       cursor: pointer;
-      background: #FFFFFF;
-      box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+      border: 1px solid #234664;
     `}
 `;
 
 const MenuItensOptionText = styled.a`
-  color: black;
+  color: #FFFFFF;
   text-decoration: none;
   font-size: 14px;
   font-weight: 700;

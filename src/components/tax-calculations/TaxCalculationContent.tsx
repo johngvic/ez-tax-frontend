@@ -1,7 +1,7 @@
 "use client"
 
 import styled from "styled-components";
-import TaxCalculationSelector from "@/components/tax-calculations/TaxCalculationSelector";
+import TaxCalculationForm from "@/components/tax-calculations/TaxCalculationForm";
 import TaxCalculationTable from "@/components/tax-calculations/TaxCalculationTable";
 
 interface TaxCalculationContentProps {
@@ -11,7 +11,7 @@ interface TaxCalculationContentProps {
 export default function TaxCalculationContent({ token }: TaxCalculationContentProps) {
   return (
     <Container>
-      <TaxCalculationSelector token={token} />
+      <TaxCalculationForm token={token} />
       <TaxCalculationTable token={token} />
     </Container>
   )
@@ -19,7 +19,7 @@ export default function TaxCalculationContent({ token }: TaxCalculationContentPr
 
 const Container = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   position: absolute;
   margin: 8rem 0 0 19rem;
 

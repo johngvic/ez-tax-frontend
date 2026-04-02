@@ -6,11 +6,11 @@ import FileUploader from '../common/FileUploader';
 import { HttpService } from '@/service/http';
 import toast from 'react-hot-toast';
 
-interface TaxCalculationSelectorProps {
+interface TaxCalculationFormProps {
   token: string;
 }
 
-export default function TaxCalculationSelector({ token }: TaxCalculationSelectorProps) {
+export default function TaxCalculationForm({ token }: TaxCalculationFormProps) {
   const [option, setOption] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
@@ -53,16 +53,18 @@ export default function TaxCalculationSelector({ token }: TaxCalculationSelector
       switch (option) {
         case 'exclusao-pis-cofins':
           const formData = new FormData();
+
+          // TODO: allow multiple files
           formData.append('file', files[0]);
-          
+
           const service = new HttpService(token);
           await service.postExclusaoPisCofinsJob(formData);
-          
+
           sessionStorage.setItem('pendingToast', JSON.stringify({
             type: 'success',
             message: 'Relatório enviado com sucesso! Verifique a tabela abaixo para acompanhar o progresso.'
           }));
-          
+
           window.location.reload();
 
           setFiles([]);
@@ -81,17 +83,24 @@ export default function TaxCalculationSelector({ token }: TaxCalculationSelector
 
   return (
     <Container>
-      <Label>Selecione o tipo de cálculo</Label>
+      <ContainerTitle>Cálculos Fiscais</ContainerTitle>
 
       <SelectorContainer>
-        <Selector name='selectReport' value={option} onChange={(e) => setOption(e.target.value)}>
-          <Option value="">-- Selecione uma opção --</Option>
-          <Option value="exclusao-pis-cofins" >Exclusão Pis/Cofins</Option>
-        </Selector>
 
-        <FileUploader onFileSelect={handleFile} />
+        <div>
+          <Label>Selecione o tipo de cálculo</Label>
+          <Selector name='selectReport' value={option} onChange={(e) => setOption(e.target.value)}>
+            <Option value="">-- Selecione uma opção --</Option>
+            <Option value="exclusao-pis-cofins" >Exclusão Pis/Cofins</Option>
+          </Selector>
+        </div>
 
-        <Button onClick={handleGenerate} disabled={loading}>
+        <div>
+          <Label>Selecionar arquivo(s)</Label>
+          <FileUploader onFileSelect={handleFile} />
+        </div>
+        
+        <Button onClick={handleGenerate} disabled={loading} style={loading ? { cursor: 'default', backgroundColor: '#cccccc' } : {  }}>
           <ButtonText>{loading ? 'Enviando...' : 'Gerar'}</ButtonText>
         </Button>
       </SelectorContainer>
@@ -103,20 +112,38 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 4rem;
-  margin-top: 30px;
+  border-radius: .5rem;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  background-color: #FCFCFC;
 
   @media (max-width: 768px) {
     margin: 0;
   }
 `
 
+const ContainerTitle = styled.div`
+  width: 20rem;
+  height: 3rem;
+  background: #00294A;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  border-radius: .5rem .5rem 0 0;
+  padding-left: 1rem;
+  font-weight: 600;
+  color: #FFFFFF;
+`
+
 const Label = styled.p`
   font-weight: 600;
+  margin-bottom: .5rem;
+  margin-top: 0;
 `
 
 const SelectorContainer = styled.div`
   display: flex;
   flex-direction: column;
+  padding: 1rem 1rem 1rem 1rem;
   gap: 1.5rem;
 
   @media (max-width: 768px) {
@@ -127,12 +154,13 @@ const SelectorContainer = styled.div`
 `
 
 const Selector = styled.select`
-  width: 15rem;
+  width: 95%;
   outline: none;
   padding: .5rem;
   border-radius: 8px;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   cursor: pointer;
+  width: 100%;
 
   @media (max-width: 768px) {
     width: 18rem;
@@ -142,26 +170,16 @@ const Selector = styled.select`
 const Option = styled.option``
 
 const Button = styled.button`
-  background-color: #eeeeed;
-  gap: 0.35em;
-  padding: .5rem 1.25rem;
-  padding-right: 1.25em;
-  border: 1px solid #C0C0C0;
-  font-weight: 700;
-  border-radius: 10px;
-  font-size: 1rem;
-  transition: .4s;
+  height: 2.3rem;
+  background-color: #012A49;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  color: #FFFFFF;
+  border: 0;
+  border-radius: .5rem;
   cursor: pointer;
-  width: 15rem;
-
-  &:hover {
-    box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
-  }
-
-  @media (max-width: 768px) {
-    width: fit-content;
-    margin-left: 0;
-  }
 `
 
-const ButtonText = styled.span``
+const ButtonText = styled.span`
+
+`
