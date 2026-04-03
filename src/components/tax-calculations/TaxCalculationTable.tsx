@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { HttpService } from '@/service/http';
-import { DownloadIcon } from 'lucide-react';
+import { DownloadIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { ExclusaoPisCofinsJob, TaxCalculationType, ExclusaoPisCofinsStatus } from '@/types/TaxCalculations';
 
 interface TaxCalculationTableProps {
@@ -14,6 +14,7 @@ export default function TaxCalculationTable({ token }: TaxCalculationTableProps)
   const [jobs, setJobs] = useState<ExclusaoPisCofinsJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const columns: string[] = ['ID', 'CNPJ', 'Tipo', 'Criado em', 'Status', 'Download'];
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -79,42 +80,66 @@ export default function TaxCalculationTable({ token }: TaxCalculationTableProps)
     }
   };
 
-  if (loading) return <div style={{ marginLeft: '4rem' }}>Loading...</div>;
-  if (error) return <GenericErrorContainer>Erro: {error}</GenericErrorContainer>;
-
   return (
     <Container>
-      <Title>Histórico de Cálculos</Title>
-      <Table>
-        <thead>
-          <tr>
-            <Th>ID</Th>
-            <Th>CNPJ</Th>
-            <Th>Cálculo</Th>
-            <Th>Data Criação</Th>
-            <Th>Status</Th>
-            <Th>Download</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {jobs.map((job) => (
-            <tr key={job.calculationId}>
-              <Td>{job.calculationId}</Td>
-              <Td>{job.cnpj}</Td>
-              <Td>{parseCalculationType(job.type)}</Td>
-              <Td>{formatDate(job.createdAt)}</Td>
-              <Td>{parseStatus(job.status)}</Td>
-              <Td style={{ textAlign: 'center' }}>
-                {job.status === ExclusaoPisCofinsStatus.Completed && (
-                  <DownloadButton onClick={() => handleDownload(job.calculationId, job.cnpj)}>
-                    <DownloadIcon width={15} />
-                  </DownloadButton>
-                )}
-              </Td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <ContainerTitle>
+        <Title>Histórico de Cálculos</Title>
+      </ContainerTitle>
+
+      {
+        loading ? (
+          <InfoContainer>Carregando histórico...</InfoContainer>
+        ) : error ? (
+          <GenericErrorContainer>Erro ao carregar cálculos: {error}</GenericErrorContainer>
+        ) :
+        jobs.length === 0 ? (
+          <InfoContainer>Nenhum cálculo realizado ainda.</InfoContainer>
+        ) : (
+          <div style={{ overflowY: 'auto', justifyContent: 'center', display: 'flex' }}>
+            <StyledTable>
+              <TableHeader>
+                <tr>
+                  {columns.map((column, index) => (
+                    <Th key={index}>{column}</Th>
+                  ))}
+                </tr>
+              </TableHeader>
+              <tbody>
+                {jobs.map((row, rowIndex) => (
+                  <Tr key={rowIndex}>
+                    {columns.map((column, colIndex) => (
+                      <Td key={colIndex}>
+                        {column === 'ID' && row.calculationId}
+                        {column === 'CNPJ' && row.cnpj}
+                        {column === 'Tipo' && parseCalculationType(row.type)}
+                        {column === 'Criado em' && formatDate(row.createdAt)}
+                        {column === 'Status' && parseStatus(row.status)}
+                        {column === 'Download' && (
+                          <DownloadButton onClick={() => handleDownload(row.calculationId, row.cnpj)}>
+                            <DownloadIcon width={15} />
+                          </DownloadButton>
+                        )}
+                      </Td>
+                    ))}
+                  </Tr>
+                ))}
+              </tbody>
+            </StyledTable>
+          </div>)
+      }
+
+      {/* <PaginationContainer>
+        <PageActionButton>
+          <ChevronLeftIcon width={15} />
+        </PageActionButton>
+
+        <PageNumberButton active={true}>1</PageNumberButton>
+
+        <PageActionButton>
+          <ChevronRightIcon width={15} />
+        </PageActionButton>
+      </PaginationContainer> */}
+
     </Container>
   );
 }
@@ -123,31 +148,71 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 4rem;
+  border-radius: .5rem;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  background-color: #FCFCFC;
+  width: 57vw;
+  height: 80vh;
+  
 
   @media (max-width: 768px) {
     margin: 0;
   }
 `;
 
+const ContainerTitle = styled.div`
+  width: 100%;
+  height: 3rem;
+  background: #00294A;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  border-radius: .5rem .5rem 0 0;
+`
+
 const Title = styled.label`
-  margin: 0 0 1rem 0;
   font-weight: 600;
+  color: #FFFFFF;
+  margin: 0;
+  padding-left: 1rem;
 `;
 
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
+const StyledTable = styled.table`
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin: 1rem;
+  width: 65rem;
+`;
+
+const TableHeader = styled.thead`
+  background-color: #f9f9f9;
 `;
 
 const Th = styled.th`
-  border: 1px solid #ddd;
-  padding: 8px 14px;
+  padding: 1rem 1.25rem;
   text-align: left;
+  font-weight: 800;
+  color: black;
+  border-bottom: 1px solid #e0e0e0;
+  white-space: nowrap;
 `;
 
 const Td = styled.td`
-  border: 1px solid #ddd;
-  padding: 8px 14px;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f0f0f0;
+  color: black;
+`;
+
+const Tr = styled.tr`
+  &:last-child td {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: #fafafa;
+  }
 `;
 
 const DownloadButton = styled.button`
@@ -165,11 +230,56 @@ const DownloadButton = styled.button`
 `;
 
 const GenericErrorContainer = styled.div`
-  margin-left: 4rem;
-  margin-top: 5rem;
+  margin: 2rem;
   padding: 1rem;
   background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
   border-radius: .6rem;
 `;
+
+const InfoContainer = styled.div`
+  margin: 2rem 1rem;
+  color: #555;
+  font-weight: bold;
+`
+
+const PaginationContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: .4rem;
+  width: 20rem;
+  height: 2rem;
+  justify-self: center;
+  align-self: center;
+  justify-content: center;
+`
+
+const PageActionButton = styled.button`
+  background-color: #F9F8FA;
+  border: 1px solid #E0E0E0;
+  padding: 2px 7px;
+  border-radius: .6rem;
+  align-content: center;
+  text-align: center;
+  cursor: pointer;
+`
+
+const PageNumberButton = styled.button<{ active?: boolean }>`
+  background-color: ${props => props.active ? '#002A4C' : '#F9F8FA'};
+  color: ${props => props.active ? 'white' : '#333'};
+  border: ${props => props.active ? 'none' : '1px solid #E0E0E0'};
+  padding: 2px 10px;
+  border-radius: .6rem;
+  align-content: center;
+  text-align: center;
+  width: 2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+
+  &:hover {
+    background-color: ${props => props.active ? '#002A4C' : '#002a4cbe'};
+    color: ${props => props.active ? 'white' : 'white'};
+  }
+`

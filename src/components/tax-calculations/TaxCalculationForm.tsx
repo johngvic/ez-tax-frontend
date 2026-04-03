@@ -54,15 +54,16 @@ export default function TaxCalculationForm({ token }: TaxCalculationFormProps) {
         case 'exclusao-pis-cofins':
           const formData = new FormData();
 
-          // TODO: allow multiple files
-          formData.append('file', files[0]);
+          files.forEach((file) => {
+            formData.append('files', file);
+          });
 
           const service = new HttpService(token);
           await service.postExclusaoPisCofinsJob(formData);
 
           sessionStorage.setItem('pendingToast', JSON.stringify({
             type: 'success',
-            message: 'Relatório enviado com sucesso! Verifique a tabela abaixo para acompanhar o progresso.'
+            message: 'Arquivos enviados com sucesso! O relatório estará disponível para download assim que o processamento for concluído.'
           }));
 
           window.location.reload();
@@ -115,6 +116,7 @@ const Container = styled.div`
   border-radius: .5rem;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
   background-color: #FCFCFC;
+  height: 46vh;
 
   @media (max-width: 768px) {
     margin: 0;
