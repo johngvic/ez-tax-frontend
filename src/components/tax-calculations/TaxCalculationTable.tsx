@@ -40,8 +40,10 @@ export default function TaxCalculationTable({ token }: TaxCalculationTableProps)
         return 'Em andamento';
       case ExclusaoPisCofinsStatus.Completed:
         return 'Concluído';
+      case ExclusaoPisCofinsStatus.Failed:
+        return 'Falha';
       default:
-        return 'N/A';
+        return 'Pendente';
     }
   }
 
@@ -114,7 +116,7 @@ export default function TaxCalculationTable({ token }: TaxCalculationTableProps)
                         {column === 'Tipo' && parseCalculationType(row.type)}
                         {column === 'Criado em' && formatDate(row.createdAt)}
                         {column === 'Status' && parseStatus(row.status)}
-                        {column === 'Download' && (
+                        {column === 'Download' && row.status === ExclusaoPisCofinsStatus.Completed && (
                           <DownloadButton onClick={() => handleDownload(row.calculationId, row.cnpj)}>
                             <DownloadIcon width={15} />
                           </DownloadButton>
